@@ -1,6 +1,6 @@
-# -*- coding:cp949 -*-
-
 import discord
+
+adroles = ['경찰', '검찰', '의원']
 dc = dict()
 class GuildData:
     class ChannelsData:
