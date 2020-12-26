@@ -1,5 +1,6 @@
 from db import *
 from discord.ext import commands
+import imagecomp
 
 async def middle_finger_report(gld, userid, mcnl):
     global dc
@@ -32,6 +33,29 @@ async def autoreact(message):
     if message.author in rmdc:
         await message.add_reaction(rmdc[message.author])
 
+async def attach_mdr(message):
+    global dc
+    ofls, cfls = [], []
+    cnt = 0
+    for att in message.attachments:
+        await att.save('ats/' + att.filename)
+        ofl = discord.File(open('ats/' + att.filename, 'rb'))
+        ofls.append(ofl)
+        typ = imagecomp.getfiletype('ats/' + att.filename)
+        if typ == 'img':
+            cfl = discord.File(open(imagecomp.comp('ats/' + att.filename), 'rb'))
+            cfls.append(cfl)
+        else: cfls.append(ofl)
+        if ofl.filename != cfl.filename: cnt += 1
+    cnl = dc[message.guild].cnls.attachlog
+    if len(ofls) and cnl != None:
+        if cnt:
+            await message.channel.send(content = '<@%d> >> %s'%(message.author.id, message.content), files = cfls,
+                allowed_mentions=discord.AllowedMentions.none())
+            await message.delete()
+        await cnl.send(content = '<@%d> >> %s'%(message.author.id, message.content), files = ofls,
+            allowed_mentions=discord.AllowedMentions.none())
+
 class Core(commands.Cog):
     def __init__(self, app):
         self.app = app
@@ -46,6 +70,7 @@ class Core(commands.Cog):
             await message.delete()
             return
         await autoreact(message)
+        if len(message.attachments): await attach_mdr(message)
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
