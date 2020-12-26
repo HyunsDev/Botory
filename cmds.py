@@ -11,7 +11,7 @@ class Core(commands.Cog):
         await ctx.message.delete()
         if ctx.guild not in dc: dc[ctx.guild] = GuildData(ctx.guild)
         if ctx.author.top_role.name != "서버장": return
-        if arg in ['report', 'rankonly', 'emojilog']:
+        if arg in ['report', 'rankonly', 'emojilog', 'attachlog']:
             dc[ctx.guild].cnls[arg] = ctx.channel
             await ctx.channel.send('%s channel set here'%arg, delete_after=1.0)
 
