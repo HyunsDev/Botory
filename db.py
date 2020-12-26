@@ -23,3 +23,4 @@ class GuildData:
         self.cnls = self.ChannelsData()
         self.reaction_macro = dict()
         self.maxmsglen = 200
+        self.banishdata = dict()
