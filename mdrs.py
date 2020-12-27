@@ -93,7 +93,6 @@ class Core(commands.Cog):
         gld = reaction.message.guild
         if gld not in dc: dc[gld] = GuildData()
         if reaction.message.channel in dc[gld].cnls.ignore: return
-        if gld not in dc: dc[gld] = GuildData()
         ec = dc[gld].cnls.emojilog
         if ec != None:
             embed = discord.Embed(description='From %s, <@%d> removed this emoji ⬇'%(reaction.message.jump_url, user.id))

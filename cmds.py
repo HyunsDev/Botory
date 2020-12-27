@@ -39,7 +39,7 @@ class Core(commands.Cog):
         await ctx.message.delete()
         if ctx.guild not in dc: dc[ctx.guild] = GuildData(ctx.guild)
         if ctx.author.top_role.name != "서버장": return
-        who = discord.utils.get(ctx.guild.members, id = int(who[3:-1]))
+        who = m2m(who, ctx.guild)
         dc[ctx.guild].reaction_macro[who] = what
         
     @commands.command(name = "reactoff")
@@ -50,7 +50,7 @@ class Core(commands.Cog):
         if ctx.author.top_role.name != "서버장": return
         if who == "all": dc[ctx.guild].reaction_macro = dict()
         else:
-            who = discord.utils.get(ctx.guild.members, id = int(who[3:-1]))
+            who = m2m(who, ctx.guild)
             del dc[ctx.guild].reaction_macro[who]
 
     @commands.command(name = 'banish')
@@ -59,7 +59,7 @@ class Core(commands.Cog):
         await ctx.message.delete()
         if ctx.guild not in dc: dc[ctx.guild] = GuildData(ctx.guild)
         if ctx.author.top_role.name != '서버장': return
-        who = discord.utils.get(ctx.guild.members, id = int(who[3:-1]))
+        who = m2m(who, ctx.guild)
         if who in dc[ctx.guild].banishdata: await ctx.channel.send('<@%d> 님은 이미 유배중입니다.'%who.id, allowed_mentions = discord.AllowedMentions.none(), delete_after=1.0)
         else:
             onick = who.nick
@@ -77,11 +77,11 @@ class Core(commands.Cog):
         global dc
         await ctx.message.delete()
         if ctx.author.top_role.name != '서버장': return
-        who = discord.utils.get(ctx.guild.members, id = int(who[3:-1]))
+        who = m2m(who, ctx.guild)
         if who not in dc[ctx.guild].banishdata: await ctx.channel.send('<@%d> 님은 유배중이 아닙니다.'%who.id, allowed_mentions = discord.AllowedMentions.none(), delete_after=1.0)
         else:
             onick, orls = dc[ctx.guild].banishdata[who]
             del dc[ctx.guild].banishdata[who]
             await who.edit(nick = onick)
             await who.add_roles(*orls)
-            await ctx.channel.send('<@%d> 님을 복귀시켰습니다.'%who.id, allowed_mentions = discord.AllowedMentions.none(), delete_after=1.0)
+            await ctx.channel.send('<@%d> 님을 복직시켰습니다.'%who.id, allowed_mentions = discord.AllowedMentions.none(), delete_after=1.0)

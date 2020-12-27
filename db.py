@@ -26,3 +26,9 @@ class GuildData:
         self.reaction_macro = dict()
         self.maxmsglen = 200
         self.banishdata = dict()
+
+def m2m(who, gld):
+    who = who[2:-1]
+    if who[0] == '!': who = who[1:]
+    who = discord.utils.get(gld.members, id = int(who))
+    return who
