@@ -38,15 +38,15 @@ async def attach_mdr(message):
     ofls, cfls = [], []
     cnt = 0
     for att in message.attachments:
-        await att.save('ats/' + att.filename)
-        ofl = discord.File(open('ats/' + att.filename, 'rb'))
+        opth = 'ats/' + att.filename
+        await att.save(opth)
+        ofl = discord.File(open(opth, 'rb'))
         ofls.append(ofl)
-        typ = imagecomp.getfiletype('ats/' + att.filename)
-        if typ == 'img':
-            cfl = discord.File(open(imagecomp.comp('ats/' + att.filename), 'rb'))
-            cfls.append(cfl)
-        else: cfls.append(ofl)
-        if ofl.filename != cfl.filename: cnt += 1
+        npth = imagecomp.comp(opth)
+        if opth == npth: cfls.append(ofl)
+        else:
+            cfls.append(discord.File(open(npth, 'rb')))
+            cnt += 1
     cnl = dc[message.guild].cnls.attachlog
     if len(ofls) and cnl != None:
         if cnt:
