@@ -49,11 +49,13 @@ async def attach_mdr(message):
             cnt += 1
     cnl = dc[message.guild].cnls.attachlog
     if len(ofls) and cnl != None:
+        dispname = message.author.nick
+        if dispname == None: dispname = message.author.name
         if cnt:
-            await message.channel.send(content = '<@%d> >> %s'%(message.author.id, message.content), files = cfls,
+            await cnl.send(content = '<@%d> >> %s'%(message.author.id, message.content), files = ofls,
                 allowed_mentions=discord.AllowedMentions.none())
             await message.delete()
-        await cnl.send(content = '<@%d> >> %s'%(message.author.id, message.content), files = ofls,
+        await message.channel.send(content = '%s >> %s'%(dispname, message.content), files = cfls,
             allowed_mentions=discord.AllowedMentions.none())
 
 class Core(commands.Cog):
