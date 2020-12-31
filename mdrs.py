@@ -51,12 +51,12 @@ async def attach_mdr(message):
     if len(ofls) and cnl != None:
         dispname = message.author.nick
         if dispname == None: dispname = message.author.name
-        if cnt:
-            await cnl.send(content = '<@%d> >> %s'%(message.author.id, message.content), files = ofls,
-                allowed_mentions=discord.AllowedMentions.none())
-            await message.delete()
-        await message.channel.send(content = '%s >> %s'%(dispname, message.content), files = cfls,
+        await cnl.send(content = '<@%d> >> %s'%(message.author.id, message.content), files = ofls,
             allowed_mentions=discord.AllowedMentions.none())
+        if cnt:
+            await message.delete()
+            await message.channel.send(content = '%s >> %s'%(dispname, message.content), files = cfls,
+                allowed_mentions=discord.AllowedMentions.none())
 
 class Core(commands.Cog):
     def __init__(self, app):
