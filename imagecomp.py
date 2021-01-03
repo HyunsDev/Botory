@@ -20,6 +20,7 @@ def imgcomp(path):
     cimg = Image.open(path)
     nimg = Image.new('RGBA', (int(cimg.height * prop), cimg.height), (0, 0, 0, 0))
     nimg.paste(cimg, (0, 0))
+    if nimg.height > 800: nimg = nimg.resize((2000, 800), Image.LANCZOS)
     hsh = 'ats/%x.png'%hash(nimg.tobytes())
     nimg.save(fp=hsh)
     return hsh
