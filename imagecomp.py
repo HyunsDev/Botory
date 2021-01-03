@@ -1,5 +1,6 @@
 from PIL import Image
 import os
+from pathlib import Path
 
 prop = 2.5
 
@@ -20,6 +21,7 @@ def imgcomp(path):
     cimg = Image.open(path)
     nimg = Image.new('RGBA', (int(cimg.height * prop), cimg.height), (0, 0, 0, 0))
     nimg.paste(cimg, (0, 0))
+    if nimg.height > 800: nimg = nimg.resize((2000, 800), Image.LANCZOS)
     hsh = 'ats/%x.png'%hash(nimg.tobytes())
     nimg.save(fp=hsh)
     return hsh
@@ -43,6 +45,7 @@ def gifcomp(path):
         frames[i] = nimg
     hsh = 'ats/%x.gif'%hash(hsh)
     frames[0].save(hsh, save_all = True, append_images = frames[1:], duration = dura / len(frames), loop = True, transparency = 0)
+    if Path(hsh).stat().st_size > 7.9*1024*1024: return path
     return hsh
 
 if __name__ == '__main__':

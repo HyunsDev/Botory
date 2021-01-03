@@ -1,15 +1,23 @@
 import asyncio, discord, sys, os
+import pickle
 from discord.ext import commands
 import cmds, mdrs
 
 app = commands.Bot(command_prefix='bt!', intents=discord.Intents.all())
 
+@app.event
+async def on_ready():
+    await app.change_presence(activity = discord.Game('보토리 1.0.0 | 제작자 Undec | 정상작동'))
+
 if __name__ == "__main__":
-    testtoken = 'NzkyMjg2ODU2ODI5ODYxODk4.X-bgog.aQ06fxs9SfGQRngOSGTuMpv1qXE'
-    token = 'Nzc1NjA2OTc3NzEwNzg0NTM0.X6oySQ.uVjDhkMJrHRAIGDYEQIM5Pc6F68'
+    if not os.path.isfile('tokens.pkl'):
+        tt = input('testtoken :')
+        rt = input('realtoken :')
+        with open('tokens.pkl', 'wb') as f: pickle.dump((tt, rt), f)
+    with open('tokens.pkl', 'rb') as f: tt, rt = pickle.load(f)
     if not os.path.exists('ats'): os.makedirs('ats')
     app.add_cog(cmds.Core(app))
     app.add_cog(mdrs.Core(app))
-    if len(sys.argv) < 2: app.run(testtoken)
-    elif sys.argv[1] != 'realwork': app.run(testtoken)
-    else: app.run(token)
+    if len(sys.argv) < 2: app.run(tt)
+    elif sys.argv[1] != 'realwork': app.run(tt)
+    else: app.run(rt)
