@@ -10,6 +10,7 @@ async def middle_finger_report(gld, userid, mcnl):
 
 async def filter_message(message):
     global dc
+    rcnl = dc[message.guild].cnls.report
     if message.author.top_role.name in ['서버장', '대장']: return False
     if message.channel in dc[message.guild].cnls.ignore: return False
     if '🖕' in message.content:
@@ -17,14 +18,21 @@ async def filter_message(message):
         return True
     if "서버장" in list(map(lambda x: x.top_role.name, message.mentions)):
         await message.channel.send("<@%d> 허가받은 역할멘션 외 서버장 직접 멘션은 경고조치됩니다."%message.author.id)
-        rcnl = dc[message.guild].cnls.report
         if rcnl != None: await rcnl.send("<@%d> 이 사용자 서버장 직접멘션으로 경고바랍니다."%message.author.id, allowed_mentions = discord.AllowedMentions.none())
         return True
     if message.channel == dc[message.guild].cnls.rankonly:
-        if message.content != "!rank" or len(message.attachments): return True
+        if len(message.attachments): return True
+        if message.content[:5] != '!rank': return True
+        if len(message.mentions):
+            await message.channel.send("<@%d> 멘션을 사용한 랭크명령어는 경고조치됩니다."%message.author.id, delete_after = 1.0)
+            if rcnl != None: await rcnl.send("<@%d> 이 사용자 랭크명령어 멘션으로 경고바랍니다."%message.author.id, allowed_mentions = discord.AllowedMentions.none())
+            return True
     mxlen = dc[message.guild].maxmsglen
     if len(message.content) > mxlen:
         await message.channel.send("<@%d> %d자 초과로 삭제되었습니다."%(message.author.id, mxlen), delete_after = 1.0)
+        return True
+    if message.content.count('\n') > 4:
+        await message.channel.send("<@%d> 5줄 이상은 안받아요."%message.author.id, delete_after = 1.0)
         return True
     return False
 
