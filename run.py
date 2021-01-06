@@ -7,7 +7,7 @@ app = commands.Bot(command_prefix='bt!', intents=discord.Intents.all())
 
 @app.event
 async def on_ready():
-    await app.change_presence(activity = discord.Game('보토리 1.1.0 | 제작자 Undec | 정상작동'))
+    await app.change_presence(activity = discord.Game('보토리 1.2.0 | 제작자 Undec | 정상작동'))
 
 if __name__ == "__main__":
     if not os.path.isfile('tokens.pkl'):

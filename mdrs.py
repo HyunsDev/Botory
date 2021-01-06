@@ -42,7 +42,7 @@ async def autoreact(message):
         await message.add_reaction(rmdc[message.author])
 
 async def attach_mdr(message):
-    global dc
+    global dc, imgdc
     ofls, cfls = [], []
     cnt = 0
     for att in message.attachments:
@@ -63,8 +63,10 @@ async def attach_mdr(message):
             allowed_mentions=discord.AllowedMentions.none())
         if cnt:
             await message.delete()
-            await message.channel.send(content = '%s >> %s'%(dispname, message.content), files = cfls,
+            msg = await message.channel.send(content = '%s >> %s'%(dispname, message.content), files = cfls,
                 allowed_mentions=discord.AllowedMentions.none())
+            await msg.add_reaction('❌')
+            imgdc[msg] = message.author.id
 
 class Core(commands.Cog):
     def __init__(self, app):
@@ -84,8 +86,13 @@ class Core(commands.Cog):
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
-        global dc
+        global dc, imgdc
         if user.bot: return
+        if reaction.message in imgdc and reaction.emoji == '❌':
+            if user.id == imgdc[reaction.message]:
+                del imgdc[reaction.message]
+                await reaction.message.delete()
+                return
         if user.top_role.name in ["서버장", "대장"]: return
         msg = reaction.message
         cnl = msg.channel
