@@ -1,5 +1,6 @@
 import asyncio, discord, sys, os
 import pickle
+import db
 from discord.ext import commands
 import cmds, mdrs
 
@@ -7,7 +8,8 @@ app = commands.Bot(command_prefix='bt!', intents=discord.Intents.all())
 
 @app.event
 async def on_ready():
-    await app.change_presence(activity = discord.Game('보토리 1.2.0 | 제작자 Undec | 정상작동'))
+    await app.change_presence(activity = discord.Game('보토리 %s | 제작자 Undec | 정상작동'%db.botversion))
+    db.loaddb(app)
 
 if __name__ == "__main__":
     if not os.path.isfile('tokens.pkl'):
@@ -21,3 +23,4 @@ if __name__ == "__main__":
     if len(sys.argv) < 2: app.run(tt)
     elif sys.argv[1] != 'realwork': app.run(tt)
     else: app.run(rt)
+    db.savedb()
