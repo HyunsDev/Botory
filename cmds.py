@@ -64,7 +64,7 @@ class Core(commands.Cog):
             orls = []
             for rl in who.roles:
                 if rl.name in adroles: orls.append(rl)
-            await who.remove_roles(*orls)
+            await who.remove_roles(*orls[::-1])
             db.banishdata[who] = (onick, orls)
             await ctx.channel.send('<@%d> 님을 유배했습니다.'%who.id, allowed_mentions = discord.AllowedMentions.none(), delete_after=1.0)
 
