@@ -39,6 +39,18 @@ class Core(commands.Cog):
         what = str(what)
         if len(what) == 1: db.autoreacts[who] = str(what)
         else: db.autoreacts[who] = int(str(what).split(':')[2][:-1])
+
+    @commands.command(name = "reactauto")
+    async def reactauto(self, ctx, who, duration, what):
+        global db
+        await ctx.message.delete()
+        if ctx.author.top_role.name != "서버장": return
+        who = m2m(who, ctx.guild)
+        what = str(what)
+        if len(what) == 1: db.autoreacts[who] = str(what)
+        else: db.autoreacts[who] = int(str(what).split(':')[2][:-1])
+        await asyncio.sleep(int(duration))
+        del db.autoreacts[who]
         
     @commands.command(name = "reactoff")
     async def reactoff(self, ctx, who):
@@ -48,7 +60,7 @@ class Core(commands.Cog):
         if who == "all": db.autoreacts = dict()
         else:
             who = m2m(who, ctx.guild)
-            del db.autoreact[who]
+            del db.autoreacts[who]
 
     @commands.command(name = 'banish')
     async def banish(self, ctx, who):
