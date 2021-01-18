@@ -39,9 +39,9 @@ async def filter_message(message):
 
 async def autoreact(message):
     if message.author in db.autoreacts:
-        emj = db.autoreacts[message.author]
-        if type(emj) != str: emj = discord.utils.get(message.guild.emojis, id=emj)
-        await message.add_reaction(emj)
+        for emj in db.autoreacts[message.author]:
+            if type(emj) != str: emj = discord.utils.get(message.guild.emojis, id=emj)
+            await message.add_reaction(emj)
 
 async def attach_mdr(message):
     global db, imgdc
