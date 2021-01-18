@@ -30,26 +30,30 @@ class Core(commands.Cog):
         db.igcnls.remove(ctx.channel)
         await ctx.channel.send('This channel will NOT be ignored anymore', delete_after=1.0)
 
-    @commands.command(name = "reactauto")
-    async def reactauto(self, ctx, who, what):
+    @commands.command(name = "react")
+    async def react(self, ctx, who, *whats):
         global db
         await ctx.message.delete()
         if ctx.author.top_role.name != "서버장": return
         who = m2m(who, ctx.guild)
-        what = str(what)
-        if len(what) == 1: db.autoreacts[who] = str(what)
-        else: db.autoreacts[who] = int(str(what).split(':')[2][:-1])
+        db.autoreacts[who] = []
+        for what in whats:
+            what = str(what)
+            if len(what) == 1: db.autoreacts[who].append(str(what))
+            else: db.autoreacts[who].append(int(str(what).split(':')[2][:-1]))
 
-    @commands.command(name = "reactauto")
-    async def reactauto(self, ctx, who, duration, what):
+    @commands.command(name = "tempreact")
+    async def tempreact(self, ctx, who, duration, *whats):
         global db
         await ctx.message.delete()
         if ctx.author.top_role.name != "서버장": return
         who = m2m(who, ctx.guild)
-        what = str(what)
-        if len(what) == 1: db.autoreacts[who] = str(what)
-        else: db.autoreacts[who] = int(str(what).split(':')[2][:-1])
-        await asyncio.sleep(int(duration))
+        db.autoreacts[who] = []
+        for what in whats:
+            what = str(what)
+            if len(what) == 1: db.autoreacts[who].append(str(what))
+            else: db.autoreacts[who].append(int(str(what).split(':')[2][:-1]))
+        await asyncio.sleep(dur2sec(duration))
         del db.autoreacts[who]
         
     @commands.command(name = "reactoff")

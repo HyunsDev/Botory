@@ -39,9 +39,9 @@ async def filter_message(message):
 
 async def autoreact(message):
     if message.author in db.autoreacts:
-        emj = db.autoreacts[message.author]
-        if type(emj) != str: emj = discord.utils.get(message.guild.emojis, id=emj)
-        await message.add_reaction(emj)
+        for emj in db.autoreacts[message.author]:
+            if type(emj) != str: emj = discord.utils.get(message.guild.emojis, id=emj)
+            await message.add_reaction(emj)
 
 async def attach_mdr(message):
     global db, imgdc
@@ -94,7 +94,7 @@ class Core(commands.Cog):
                 await reaction.message.delete()
                 return
         if user.top_role.name in ["서버장", "대장"]: return
-        if message.channel in db.igcnls: return
+        if reaction.message.channel in db.igcnls: return
         if reaction.emoji == '🖕':
             await reaction.clear()
             await middle_finger_report(user.id, message.channel)
