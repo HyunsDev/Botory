@@ -94,7 +94,7 @@ class Core(commands.Cog):
                 await reaction.message.delete()
                 return
         if user.top_role.name in ["서버장", "대장"]: return
-        if message.channel in db.igcnls: return
+        if reaction.message.channel in db.igcnls: return
         if reaction.emoji == '🖕':
             await reaction.clear()
             await middle_finger_report(user.id, message.channel)
