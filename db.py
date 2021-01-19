@@ -65,10 +65,6 @@ def m2m(who, gld):
     who = discord.utils.get(gld.members, id = int(who))
     return who
 
-def dur2sec(dur):
-    d2s = {'s' : 1, 'm' : 60, 'h' : 3600, 'd' : 3600 * 24, 'w' : 3600 * 24 * 7}
-    return d2s[dur[-1]] * float(dur[:-1])
-
 def savedb():
     global db
     print('Data saving...')
