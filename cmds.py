@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from db import *
 from discord.ext import commands
 
@@ -30,17 +31,30 @@ class Core(commands.Cog):
         db.igcnls.remove(ctx.channel)
         await ctx.channel.send('This channel will NOT be ignored anymore', delete_after=1.0)
 
+    async def dur2sec(self, duration):
+        lst = [0, 0, 0, 0, 0]
+        lst['smhdw'.index(duration[-1])] = int(duration[:-1])
+        return timedelta(seconds=lst[0], minutes=lst[1], hours=lst[2], days=lst[3], weeks=lst[4])
+
+    async def _setreact(self, who, whats):
+        db.autoreacts[who] = dict()
+        emjs = []
+        for what in whats:
+            what = str(what)
+            if len(what) == 1: emjs.append(str(what))
+            else: emjs.append(int(str(what).split(':')[2][:-1]))
+        db.autoreacts[who]['emjs'] = emjs
+
     @commands.command(name = "react")
     async def react(self, ctx, who, *whats):
         global db
         await ctx.message.delete()
         if ctx.author.top_role.name != "서버장": return
         who = m2m(who, ctx.guild)
-        db.autoreacts[who] = []
-        for what in whats:
-            what = str(what)
-            if len(what) == 1: db.autoreacts[who].append(str(what))
-            else: db.autoreacts[who].append(int(str(what).split(':')[2][:-1]))
+        await self._setreact(who, whats)
+        db.autoreacts[who]['tilwhen'] = None
+        embed = discord.Embed(title='', description = '<@%d> 님께 자동 이모지가 등록되었습니다.'%who.id)
+        await ctx.channel.send(embed=embed)
 
     @commands.command(name = "tempreact")
     async def tempreact(self, ctx, who, duration, *whats):
@@ -48,14 +62,12 @@ class Core(commands.Cog):
         await ctx.message.delete()
         if ctx.author.top_role.name != "서버장": return
         who = m2m(who, ctx.guild)
-        db.autoreacts[who] = []
-        for what in whats:
-            what = str(what)
-            if len(what) == 1: db.autoreacts[who].append(str(what))
-            else: db.autoreacts[who].append(int(str(what).split(':')[2][:-1]))
-        await asyncio.sleep(dur2sec(duration))
-        del db.autoreacts[who]
-        
+        await self._setreact(who, whats)
+        embed = discord.Embed(title='', description = '<@%d> 님께 %d%s동안 자동 이모지가 등록되었습니다.'%(who.id,
+            int(duration[:-1]), {'s':'초','m':'분','h':'시간','d':'일','w':'주'}[duration[-1]]))
+        db.autoreacts[who]['tilwhen'] = datetime.now() + await self.dur2sec(duration)
+        await ctx.channel.send(embed=embed)
+
     @commands.command(name = "reactoff")
     async def reactoff(self, ctx, who):
         global db

@@ -1,3 +1,4 @@
+from datetime import datetime
 from db import *
 from discord.ext import commands
 import imagecomp
@@ -39,7 +40,11 @@ async def filter_message(message):
 
 async def autoreact(message):
     if message.author in db.autoreacts:
-        for emj in db.autoreacts[message.author]:
+        if db.autoreacts[message.author]['tilwhen'] < datetime.now():
+            del db.autoreacts[message.author]
+            return
+        emjs = db.autoreacts[message.author]['emjs']
+        for emj in emjs:
             if type(emj) != str: emj = discord.utils.get(message.guild.emojis, id=emj)
             await message.add_reaction(emj)
 
