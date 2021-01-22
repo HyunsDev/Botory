@@ -1,3 +1,4 @@
+from datetime import datetime
 from db import *
 from discord.ext import commands
 import imagecomp
@@ -12,7 +13,6 @@ async def middle_finger_report(userid, mcnl):
 async def filter_message(message):
     global db
     if message.author.top_role.name in ['서버장', '대장']: return False
-    if message.channel in db.igcnls: return False
     if '🖕' in message.content:
         await middle_finger_report(message.author.id, message.channel)
         return True
@@ -39,7 +39,11 @@ async def filter_message(message):
 
 async def autoreact(message):
     if message.author in db.autoreacts:
-        for emj in db.autoreacts[message.author]:
+        if db.autoreacts[message.author]['tilwhen'] < datetime.now():
+            del db.autoreacts[message.author]
+            return
+        emjs = db.autoreacts[message.author]['emjs']
+        for emj in emjs:
             if type(emj) != str: emj = discord.utils.get(message.guild.emojis, id=emj)
             await message.add_reaction(emj)
 
@@ -78,6 +82,7 @@ class Core(commands.Cog):
     async def on_message(self, message):
         global db
         if message.author.bot: return
+        if message.channel in db.igcnls: return
         if await filter_message(message):
             await message.delete()
             return

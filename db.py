@@ -1,7 +1,7 @@
 import asyncio, pickle, os
 import discord
 
-botversion = '1.3.1'
+botversion = '1.3.2'
 adroles = ['경찰', '검찰', '의원']
 cnlnames = ['report', 'rankonly', 'emojilog', 'attachlog']
 
@@ -64,10 +64,6 @@ def m2m(who, gld):
     if who[0] == '!': who = who[1:]
     who = discord.utils.get(gld.members, id = int(who))
     return who
-
-def dur2sec(dur):
-    d2s = {'s' : 1, 'm' : 60, 'h' : 3600, 'd' : 3600 * 24, 'w' : 3600 * 24 * 7}
-    return d2s[dur[-1]] * float(dur[:-1])
 
 def savedb():
     global db
