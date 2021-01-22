@@ -13,7 +13,6 @@ async def middle_finger_report(userid, mcnl):
 async def filter_message(message):
     global db
     if message.author.top_role.name in ['서버장', '대장']: return False
-    if message.channel in db.igcnls: return False
     if '🖕' in message.content:
         await middle_finger_report(message.author.id, message.channel)
         return True
@@ -83,6 +82,7 @@ class Core(commands.Cog):
     async def on_message(self, message):
         global db
         if message.author.bot: return
+        if message.channel in db.igcnls: return
         if await filter_message(message):
             await message.delete()
             return
