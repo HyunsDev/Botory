@@ -102,7 +102,7 @@ class Core(commands.Cog):
         if reaction.message.channel in db.igcnls: return
         if reaction.emoji == '🖕':
             await reaction.clear()
-            await middle_finger_report(user.id, message.channel)
+            await middle_finger_report(user.id, reaction.message.channel)
 
     @commands.Cog.listener()
     async def on_reaction_remove(self, reaction, user):
