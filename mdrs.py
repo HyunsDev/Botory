@@ -70,6 +70,7 @@ async def attach_mdr(message):
         if cnt:
             await message.delete()
             msg = await message.channel.send(content = '%s >> %s'%(dispname, message.content), files = cfls,
+                reference=message.reference,
                 allowed_mentions=discord.AllowedMentions.none())
             await msg.add_reaction('❌')
             imgdc[msg] = message.author.id
