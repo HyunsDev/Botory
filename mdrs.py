@@ -47,6 +47,11 @@ async def autoreact(message):
             if type(emj) != str: emj = discord.utils.get(message.guild.emojis, id=emj)
             await message.add_reaction(emj)
 
+async def warnmention(message):
+    if message.reference != None:
+        if message.reference.resolved.author in message.mentions:
+            await message.channel.send('답장을 할 때는 오른쪽 `@켜짐`을 눌러 멘션을 꺼주세요!', delete_after = 5.0)
+
 async def attach_mdr(message):
     global db, imgdc
     ofls, cfls = [], []
@@ -88,6 +93,7 @@ class Core(commands.Cog):
             await message.delete()
             return
         if len(message.attachments): await attach_mdr(message)
+        await warnmention(message)
         await autoreact(message)
 
     @commands.Cog.listener()
