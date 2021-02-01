@@ -8,7 +8,7 @@ app = commands.Bot(command_prefix='bt!', intents=discord.Intents.all())
 
 @app.event
 async def on_ready():
-    await app.change_presence(activity = discord.Game('보토리 %s | 제작자 Undec | 정상작동'%db.botversion))
+    await app.change_presence(activity = discord.Game('Botory %s by Undec'%db.botversion))
     db.loaddb(app)
 
 if __name__ == "__main__":
