@@ -109,3 +109,21 @@ class Core(commands.Cog):
             await who.edit(nick = onick)
             await who.add_roles(*orls)
             await ctx.channel.send('<@%d> 님을 복직시켰습니다.'%who.id, allowed_mentions = discord.AllowedMentions.none(), delete_after=1.0)
+
+    @commands.command(name = 'cnlupdate')
+    async def cnlupdate(self, ctx, cnlid, val):
+        await ctx.message.delete()
+        cnl = discord.utils.get(ctx.guild.channels, id = int(cnlid[2:-1]))
+        cnlname = cnl.name
+        fr = to = 0
+        for i in range(len(cnlname) - 1, -1, -1):
+            if cnlname[i].isdigit():
+                to = i + 1
+                break
+        for i in range(to - 1, -1, -1):
+            if not cnlname[i].isdigit():
+                fr = i + 1
+                break
+        newname = cnlname[:fr] + val + cnlname[to:]
+        await cnl.edit(name = newname)
+        await ctx.channel.send(embed = discord.Embed(title = '서버 현황 업데이트', description = '%s -> %s'%(cnlname, newname[fr:])))

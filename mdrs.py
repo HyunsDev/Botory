@@ -39,9 +39,10 @@ async def filter_message(message):
 
 async def autoreact(message):
     if message.author in db.autoreacts:
-        if db.autoreacts[message.author]['tilwhen'] < datetime.now():
-            del db.autoreacts[message.author]
-            return
+        if db.autoreacts[message.author]['tilwhen'] != None:
+            if db.autoreacts[message.author]['tilwhen'] < datetime.now():
+                del db.autoreacts[message.author]
+                return
         emjs = db.autoreacts[message.author]['emjs']
         for emj in emjs:
             if type(emj) != str: emj = discord.utils.get(message.guild.emojis, id=emj)
