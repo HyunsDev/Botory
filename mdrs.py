@@ -90,6 +90,8 @@ class Core(commands.Cog):
         global db
         if message.author.bot: return
         if message.channel in db.igcnls: return
+        if '경찰' in map(lambda x: x.name, message.author.roles) and message.author.status == discord.Status.offline:
+            await message.channel.send(f'<@{message.author.id}> 관리자께서는 되도록이면 오프라인 상태를 해제하여 관리활동 중임을 표시해주세요.')
         if await filter_message(message):
             await message.delete()
             return
