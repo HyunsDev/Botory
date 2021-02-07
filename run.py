@@ -2,7 +2,7 @@ import asyncio, discord, sys, os
 import pickle
 import db
 from discord.ext import commands
-import cmds, mdrs
+import cmds, mdrs, stats
 
 app = commands.Bot(command_prefix='bt!', intents=discord.Intents.all())
 
@@ -20,6 +20,7 @@ if __name__ == "__main__":
     if not os.path.exists('ats'): os.makedirs('ats')
     app.add_cog(cmds.Core(app))
     app.add_cog(mdrs.Core(app))
+    app.add_cog(stats.Core(app))
     if len(sys.argv) < 2: app.run(tt)
     elif sys.argv[1] != 'realwork': app.run(tt)
     else: app.run(rt)
