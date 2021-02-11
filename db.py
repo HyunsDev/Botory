@@ -1,7 +1,7 @@
 import asyncio, pickle, os
 import discord
 
-botversion = '1.6.0'
+botversion = '1.6.1'
 adroles = ['경찰', '검찰', '의원']
 cnlnames = ['report', 'rankonly', 'emojilog', 'attachlog']
 
