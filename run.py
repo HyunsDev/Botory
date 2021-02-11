@@ -1,7 +1,6 @@
-import discord, sys
+import discord, sys, os, pickle
 from discord.ext import commands
-import pkgs
-from pkgs import AppData
+import cogs
 
 app = commands.Bot(command_prefix = '&', intents = discord.Intents.all())
 
@@ -12,12 +11,20 @@ def main():
 
 def InitCogs():
     res = []
-    for module in pkgs.cogs:
-        __import__(f'pkgs.{module}')
-        res.append(sys.modules[f'pkgs.{module}'].Core(app))
+    for CogName in cogs.__all__:
+        __import__(f'cogs.{CogName}')
+        res.append(sys.modules[f'cogs.{CogName}'].Core(app))
+    return res
+
+def GetToken():
+    if os.path.isfile('token.db'):
+        with open('token.db', 'rb') as f: return pickle.load(f)
+    token = input('Enter token : ')
+    with open('token.db', 'wb') as f: return pickle.dump(token, f)
+    return token
 
 @app.event
 async def on_ready():
-    await AppData.app.change_presence(activity = discord.Game('Botory 2.0.0 by Undec'))
+    await app.change_presence(activity = discord.Game('Botory 2.0.0 by Undec'))
 
 if __name__ == "__main__": main()

@@ -6,7 +6,7 @@ class Core(commands.Cog):
     def __init__(self, app):
         self.app = app
 
-    @commands.command(name = 'set')
+    @ReactorGroup.command(name = 'set')
     async def setcnl(self, ctx, arg):
         global db
         await ctx.message.delete()
@@ -44,39 +44,6 @@ class Core(commands.Cog):
             if len(what) == 1: emjs.append(str(what))
             else: emjs.append(int(str(what).split(':')[2][:-1]))
         db.autoreacts[who]['emjs'] = emjs
-
-    @commands.command(name = "react")
-    async def react(self, ctx, who, *whats):
-        global db
-        await ctx.message.delete()
-        if ctx.author.top_role.name != "서버장": return
-        who = m2m(who, ctx.guild)
-        await self._setreact(who, whats)
-        db.autoreacts[who]['tilwhen'] = None
-        embed = discord.Embed(title='', description = '<@%d> 님께 자동 이모지가 등록되었습니다.'%who.id)
-        await ctx.channel.send(embed=embed)
-
-    @commands.command(name = "tempreact")
-    async def tempreact(self, ctx, who, duration, *whats):
-        global db
-        await ctx.message.delete()
-        if ctx.author.top_role.name != "서버장": return
-        who = m2m(who, ctx.guild)
-        await self._setreact(who, whats)
-        embed = discord.Embed(title='', description = '<@%d> 님께 %d%s동안 자동 이모지가 등록되었습니다.'%(who.id,
-            int(duration[:-1]), {'s':'초','m':'분','h':'시간','d':'일','w':'주'}[duration[-1]]))
-        db.autoreacts[who]['tilwhen'] = datetime.now() + await self.dur2sec(duration)
-        await ctx.channel.send(embed=embed)
-
-    @commands.command(name = "reactoff")
-    async def reactoff(self, ctx, who):
-        global db
-        await ctx.message.delete()
-        if ctx.author.top_role.name != "서버장": return
-        if who == "all": db.autoreacts = dict()
-        else:
-            who = m2m(who, ctx.guild)
-            del db.autoreacts[who]
 
     @commands.command(name = 'banish')
     async def banish(self, ctx, who):
