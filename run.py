@@ -1,27 +1,23 @@
-import asyncio, discord, sys, os
-import pickle
-import db
+import discord, sys
 from discord.ext import commands
-import cmds, mdrs, stats
+import pkgs
+from pkgs import AppData
 
-app = commands.Bot(command_prefix='bt!', intents=discord.Intents.all())
+app = commands.Bot(command_prefix = '&', intents = discord.Intents.all())
+
+def main():
+    cogs = InitCogs()
+    app.run(GetToken())
+    for cog in cogs: cog.saveDB()
+
+def InitCogs():
+    res = []
+    for module in pkgs.cogs:
+        __import__(f'pkgs.{module}')
+        res.append(sys.modules[f'pkgs.{module}'].Core(app))
 
 @app.event
 async def on_ready():
-    await app.change_presence(activity = discord.Game('Botory %s by Undec'%db.botversion))
-    db.loaddb(app)
+    await AppData.app.change_presence(activity = discord.Game('Botory 2.0.0 by Undec'))
 
-if __name__ == "__main__":
-    if not os.path.isfile('tokens.pkl'):
-        tt = input('testtoken :')
-        rt = input('realtoken :')
-        with open('tokens.pkl', 'wb') as f: pickle.dump((tt, rt), f)
-    with open('tokens.pkl', 'rb') as f: tt, rt = pickle.load(f)
-    if not os.path.exists('ats'): os.makedirs('ats')
-    app.add_cog(cmds.Core(app))
-    app.add_cog(mdrs.Core(app))
-    app.add_cog(stats.Core(app))
-    if len(sys.argv) < 2: app.run(tt)
-    elif sys.argv[1] != 'realwork': app.run(tt)
-    else: app.run(rt)
-    db.savedb()
+if __name__ == "__main__": main()
