@@ -4,7 +4,6 @@ from discord.ext import commands
 class DBCog(commands.Cog):
     def __init__(self, app):
         self.app = app
-        self.DB = dict()
         self.loadDB()
         self.app.add_cog(self)
 
@@ -25,7 +24,7 @@ class DBCog(commands.Cog):
         print(f'{self.CogName}.db saved!')
 
     def mention2member(self, mention, guild):
-        member_id = who[2:-1]
+        member_id = mention[2:-1]
         if member_id[0] == '!': member_id = member_id[1:]
         member_id = int(member_id)
         return guild.get_member(member_id)

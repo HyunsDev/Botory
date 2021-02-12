@@ -20,7 +20,7 @@ def GetToken():
     if os.path.isfile('token.db'):
         with open('token.db', 'rb') as f: return pickle.load(f)
     token = input('Enter token : ')
-    with open('token.db', 'wb') as f: return pickle.dump(token, f)
+    with open('token.db', 'wb') as f: pickle.dump(token, f)
     return token
 
 @app.event
