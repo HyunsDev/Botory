@@ -10,7 +10,7 @@ class Core(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        await self.app.change_presence(activity = discord.Game('Botory 2.0.0 by Undec'))
+        await self.app.change_presence(activity = discord.Game('Botory 2.0.1 by Undec'))
         self.guild = self.app.guilds[0]
         self.MemberRole = discord.utils.get(self.guild.roles, name = '멤버')
         perms = self.MemberRole.permissions
@@ -25,4 +25,5 @@ class Core(commands.Cog):
         perms.update(add_reactions = False, attach_files = False)
         await self.MemberRole.edit(permissions = perms)
         await ctx.channel.send('장비를 정지합니다.')
+        await self.app.change_presence(status = discord.Status.offline)
         await self.app.close()
