@@ -1,12 +1,14 @@
 import discord
 from discord.ext import commands
 from pkgs.DBCog import DBCog
+from cogs.GlobalDB import getGlobalDB
 from functools import wraps
 
-def SkipBotNAdmin(func):
+def SkipCheck(func):
     @wraps(func)
     async def wrapper(self, message):
         if message.author.bot or message.author.guild_permissions.administrator: return
+        if message.channel.id in getGlobalDB('IgnoreChannels'): return
         return await func(self, message)
     return wrapper
 
@@ -41,28 +43,29 @@ class Core(DBCog):
         self.DB['ReportChannel'] = ctx.channel.id
 
     @commands.Cog.listener('on_message')
-    @SkipBotNAdmin
+    @SkipCheck
     async def ModShouldBeOnline(self, message):
         if '경찰' in map(lambda x: x.name, message.author.roles) and message.author.status == discord.Status.offline:
             await message.channel.send(f'<@{message.author.id}> 관리자께서는 되도록이면 오프라인 상태를 해제하여 관리활동 중임을 표시해주세요.')
 
     @commands.Cog.listener('on_message')
-    @SkipBotNAdmin
+    @SkipCheck
     async def NoMiddleFinger(self, message):
         if '🖕' in message.content:
             await message.delete()
             await self.MiddleFingerReport(message.author.id, message.channel)
 
     @commands.Cog.listener('on_message')
-    @SkipBotNAdmin
+    @SkipCheck
     async def DontMentionMaster(self, message):
         if "서버장" in list(map(lambda x: x.top_role.name, message.mentions)):
             await message.channel.send("<@%d> 허가받은 역할멘션 외 서버장 직접 멘션은 경고조치됩니다."%message.author.id)
-            if db.cnls['report'] != None:
-                await db.cnls['report'].send("<@%d> 이 사용자 서버장 직접멘션으로 경고바랍니다."%message.author.id, allowed_mentions = discord.AllowedMentions.none())
+            if self.DB['ReportChannel']:
+                ReportChanenl = message.guild.get_channel(self.DB['ReportChannel'])
+                await ReportChannel.send("<@%d> 이 사용자 서버장 직접멘션으로 경고바랍니다."%message.author.id, allowed_mentions = discord.AllowedMentions.none())
 
     @commands.Cog.listener('on_message')
-    @SkipBotNAdmin
+    @SkipCheck
     async def LengthLimiter(self, message):
         if len(message.content) > self.DB['MaxLength']:
             await message.channel.send(f'<@{message.author.id}> {self.DB["MaxLength"]}자 초과로 삭제되었습니다.', delete_after = 1.0)
@@ -72,7 +75,7 @@ class Core(DBCog):
             await message.delete()
 
     @commands.Cog.listener('on_message')
-    @SkipBotNAdmin
+    @SkipCheck
     async def DontMentionReply(self, message):
         if message.reference != None:
             if message.reference.resolved.author in message.mentions:
@@ -80,7 +83,8 @@ class Core(DBCog):
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
-        if user.bot: return
+        if user.bot or user.guild_permissions.administrator: return
+        if reaction.message.channel.id in getGlobalDB('IgnoreChannels'): return
         if '🖕' in str(reaction.emoji):
             await reaction.clear()
             await self.MiddleFingerReport(user.id, reaction.message.channel)
