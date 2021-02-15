@@ -1,4 +1,4 @@
-import discord
+import discord, asyncio
 from discord.ext import commands
 
 class Core(commands.Cog):
@@ -26,4 +26,5 @@ class Core(commands.Cog):
         await self.MemberRole.edit(permissions = perms)
         await ctx.channel.send('장비를 정지합니다.')
         await self.app.change_presence(status = discord.Status.offline)
+        await asyncio.sleep(1)
         await self.app.close()
