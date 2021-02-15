@@ -23,8 +23,4 @@ def GetToken():
     with open('token.db', 'wb') as f: pickle.dump(token, f)
     return token
 
-@app.event
-async def on_ready():
-    await app.change_presence(activity = discord.Game('Botory 2.0.0 by Undec'))
-
 if __name__ == "__main__": main()
