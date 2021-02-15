@@ -36,7 +36,7 @@ class Core(DBCog):
             await asyncio.sleep(60 * 10)
 
     @StatusGroup.command(name = 'update')
-    async def StatusSetup(self, ctx, ChannelID, value):
+    async def StatusUpdate(self, ctx, ChannelID, value):
         channel = discord.utils.get(ctx.guild.channels, id = int(ChannelID))
         ChannelName = channel.name
         fr = to = 0
