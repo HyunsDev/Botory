@@ -12,27 +12,37 @@ class Core(DBCog):
         self.DB['AllCount'] = None
         self.DB['MemberCount'] = None
 
+    @commands.Cog.listener()
+    async def on_ready(self):
+        if self.DB['AllCount']: await self.RunStatusViewer()
+
     @commands.group(name = 'status')
     @commands.has_guild_permissions(administrator = True)
     async def StatusGroup(self, ctx):
         await ctx.message.delete()
         if ctx.invoked_subcommand == None:
-            await ctx.channel.send('Status Manager\n'
-                + 'Subcommands : setup')
+            await ctx.channel.send('Status Manager\nSubcommands : setup')
 
     @StatusGroup.command(name = 'setup')
     async def StatusSetup(self, ctx, CategoryID):
-        MemberRole = discord.utils.get(ctx.guild.roles, name = '멤버')
         SetupCategory = discord.utils.get(ctx.guild.categories, id = int(CategoryID))
         self.DB['AllCount'] = await SetupCategory.create_voice_channel('전체 멤버 - 측정중🔄')
         self.DB['MemberCount'] = await SetupCategory.create_voice_channel('정식 멤버 - 측정중🔄')
+        for key in self.DB: self.DB[key] = self.DB[key].id
+        await self.RunStatusViewer()
+
+    async def RunStatusViewer(self):
+        guild = self.app.guilds[0]
+        MemberRole = discord.utils.get(guild.roles, name = '멤버')
+        AllCountChannel = guild.get_channel(self.DB['AllCount'])
+        MemberCountChannel = guild.get_channel(self.DB['MemberCount'])
         while True:
             AllCount = MemberCount = 0
-            async for member in ctx.guild.fetch_members(limit = None):
+            async for member in guild.fetch_members(limit = None):
                 AllCount += 1
                 if MemberRole in member.roles: MemberCount += 1
-            await self.DB['AllCount'].edit(name = f'전체 멤버 - {AllCount}명')
-            await self.DB['MemberCount'].edit(name = f'정식 멤버 - {MemberCount}명')
+            await AllCountChannel.edit(name = f'전체 멤버 - {AllCount}명')
+            await MemberCountChannel.edit(name = f'정식 멤버 - {MemberCount}명')
             await asyncio.sleep(60 * 10)
 
     @StatusGroup.command(name = 'update')
