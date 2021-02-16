@@ -1,4 +1,4 @@
-import discord, uuid
+import discord, uuid, os
 from PIL import Image
 from discord.ext import commands
 from pkgs.DBCog import DBCog
@@ -13,17 +13,28 @@ class Core(DBCog):
     def initDB(self):
         self.DB = dict()
         self.DB['ImageChannel'] = None
+        self.DB['IgnoreChannels'] = None
 
-    @commands.command(name = 'imagehere')
+    @commands.group(name = 'image')
     @commands.has_guild_permissions(administrator = True)
-    async def ImageHere(self, ctx):
+    async def ImageGroup(self, ctx):
         await ctx.message.delete()
+        if ctx.invoked_subcommand == None:
+            await ctx.channel.send('Automatic reactor.\nSubcommands : here, ignore')
+
+    @ImageGroup.command(name = 'here')
+    async def ImageHere(self, ctx):
         self.DB['ImageChannel'] = ctx.channel.id
+
+    @ImageGroup.command(name = 'ignore')
+    async def IgnoreHere(self, ctx):
+        self.DB['IgnoreChannels'] = ctx.channel.id
 
     @commands.Cog.listener('on_message')
     async def CompImage(self, message):
         if message.author.bot or message.author.guild_permissions.administrator: return
         if message.channel.id in getGlobalDB('IgnoreChannels'): return
+        if message.channel.id == self.DB['IgnoreChannels']: return
         if len(message.attachments) and self.DB['ImageChannel']:
             ImageChannel = message.guild.get_channel(self.DB['ImageChannel'])
             attachment = message.attachments[0]
