@@ -45,7 +45,6 @@ class Core(DBCog):
 
     @ReactorGroup.command(name = "unset")
     async def UnsetReact(self, ctx, who):
-        who = self.mention2member(who, ctx.guild)
         if who == "all": self.DB = dict()
         else:
             who = self.mention2member(who, ctx.guild)
