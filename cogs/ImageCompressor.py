@@ -13,7 +13,7 @@ class Core(DBCog):
     def initDB(self):
         self.DB = dict()
         self.DB['ImageChannel'] = None
-        self.DB['IgnoreChannels'] = None
+        self.DB['IgnoreChannels'] = set()
 
     @commands.group(name = 'image')
     @commands.has_guild_permissions(administrator = True)
@@ -28,13 +28,17 @@ class Core(DBCog):
 
     @ImageGroup.command(name = 'ignore')
     async def IgnoreHere(self, ctx):
-        self.DB['IgnoreChannels'] = ctx.channel.id
+        self.DB['IgnoreChannels'].add(ctx.channel.id)
+
+    @ImageGroup.command(name = 'watch')
+    async def WatchHere(self, ctx):
+        self.DB['IgnoreChannels'].remove(ctx.channel.id)
 
     @commands.Cog.listener('on_message')
     async def CompImage(self, message):
         if message.author.bot or message.author.guild_permissions.administrator: return
         if message.channel.id in getGlobalDB('IgnoreChannels'): return
-        if message.channel.id == self.DB['IgnoreChannels']: return
+        if message.channel.id in self.DB['IgnoreChannels']: return
         if len(message.attachments) and self.DB['ImageChannel']:
             ImageChannel = message.guild.get_channel(self.DB['ImageChannel'])
             attachment = message.attachments[0]
@@ -44,12 +48,11 @@ class Core(DBCog):
             TinyEmbed.set_thumbnail(url = attachment.url)
             TinyImageMessage = await message.channel.send(message.content, embed = TinyEmbed)
 
-            OrigEmbed = await self.GenAuthorEmbed(message.author, f'[돌아가기]({TinyImageMessage.jump_url})[]({message.author.id})')
-            OrigEmbed.set_image(url = attachment.url)
-            OriginalImageMessage = await ImageChannel.send(embed = OrigEmbed)
+            OrigEmbed = await self.GenAuthorEmbed(message.author, f'[돌아가기]({TinyImageMessage.jump_url})')
+            OriginalImageMessage = await ImageChannel.send(embed = OrigEmbed, file = await attachment.to_file(use_cached = True))
             await OriginalImageMessage.add_reaction('❌')
 
-            TinyEmbed.description = f'[원본보기]({OriginalImageMessage.jump_url})[]({message.author.id})'
+            TinyEmbed.description = f'[원본보기]({OriginalImageMessage.jump_url})'
             await TinyImageMessage.edit(embed = TinyEmbed)
             await TinyImageMessage.add_reaction('❌')
             await message.delete()
@@ -57,8 +60,7 @@ class Core(DBCog):
     @commands.Cog.listener('on_reaction_add')
     async def DelImage(self, reaction, user):
         if reaction.emoji != '❌': return
-        if reaction.message.author.id != self.app.user.id: return
-        if user.id != int(reaction.message.embeds[0].description.split('(')[-1][:-1]): return
+        if str(user.id) != reaction.message.embeds[0].url.split('/')[-1]: return
         jump_url = reaction.message.embeds[0].description.split('(')[1].split(')')[0]
         channel_id = int(jump_url.split('/')[-2])
         message_id = int(jump_url.split('/')[-1])
@@ -82,6 +84,6 @@ class Core(DBCog):
 
     async def GenAuthorEmbed(self, author, description):
         DisplayName = author.nick if author.nick else author.name
-        embed = discord.Embed(description = description)
+        embed = discord.Embed(url = f'http://www.{uuid.uuid4().hex}.com/{author.id}', description = description)
         embed.set_author(name = DisplayName, icon_url = str(author.avatar_url))
         return embed
