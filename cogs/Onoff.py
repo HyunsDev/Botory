@@ -10,7 +10,7 @@ class Core(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        await self.app.change_presence(activity = discord.Game('Botory 2.1.1 by Undec'))
+        await self.app.change_presence(activity = discord.Game('Botory 2.1.2 by Undec'))
         self.guild = self.app.guilds[0]
         self.MemberRole = discord.utils.get(self.guild.roles, name = '멤버')
         perms = self.MemberRole.permissions

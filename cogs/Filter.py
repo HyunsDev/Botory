@@ -61,7 +61,7 @@ class Core(DBCog):
         if "서버장" in list(map(lambda x: x.top_role.name, message.mentions)):
             await message.channel.send("<@%d> 허가받은 역할멘션 외 서버장 직접 멘션은 경고조치됩니다."%message.author.id)
             if self.DB['ReportChannel']:
-                ReportChanenl = message.guild.get_channel(self.DB['ReportChannel'])
+                ReportChannel = message.guild.get_channel(self.DB['ReportChannel'])
                 await ReportChannel.send("<@%d> 이 사용자 서버장 직접멘션으로 경고바랍니다."%message.author.id, allowed_mentions = discord.AllowedMentions.none())
 
     @commands.Cog.listener('on_message')
@@ -80,6 +80,12 @@ class Core(DBCog):
         if message.reference != None:
             if message.reference.resolved.author in message.mentions:
                 await message.channel.send('답장을 할 때는 되도록이면 오른쪽 `@켜짐`을 눌러 멘션을 꺼주세요!', delete_after = 5.0)
+
+    @commands.Cog.listener('on_message')
+    @SkipCheck
+    async def DontSendMultipleFiles(self, message):
+        if len(message.attachments) > 1:
+            await message.channel.send('파일은 한번에 하나씩만 보내 주세요!', delete_after = 2.0)
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
