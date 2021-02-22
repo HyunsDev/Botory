@@ -39,22 +39,22 @@ class Core(DBCog):
         if message.author.bot or message.author.guild_permissions.administrator: return
         if message.channel.id in getGlobalDB('IgnoreChannels'): return
         if message.channel.id in self.DB['IgnoreChannels']: return
-        if len(message.attachments) and self.DB['ImageChannel']:
+        if len(message.attachments) > 0 and self.DB['ImageChannel']:
             ImageChannel = message.guild.get_channel(self.DB['ImageChannel'])
             attachment = message.attachments[0]
             if not await self.isTarget(attachment): return
 
-            TinyEmbed = await self.GenAuthorEmbed(message.author, '[Button Loading]')
-            TinyEmbed.set_thumbnail(url = attachment.url)
-            TinyImageMessage = await message.channel.send(message.content, embed = TinyEmbed)
-
-            OrigEmbed = await self.GenAuthorEmbed(message.author, f'[돌아가기]({TinyImageMessage.jump_url})')
-            OriginalImageMessage = await ImageChannel.send(embed = OrigEmbed, file = await attachment.to_file(use_cached = True))
+            OrigEmbed = await self.GenAuthorEmbed(message.author, '[Button Loading]')
+            OriginalImageMessage = await ImageChannel.send(embed = OrigEmbed, file = await attachment.to_file())
             await OriginalImageMessage.add_reaction('❌')
 
-            TinyEmbed.description = f'[원본보기]({OriginalImageMessage.jump_url})'
-            await TinyImageMessage.edit(embed = TinyEmbed)
+            TinyEmbed = await self.GenAuthorEmbed(message.author, f'[원본보기]({OriginalImageMessage.jump_url})')
+            TinyEmbed.set_thumbnail(url = OriginalImageMessage.attachments[0].url)
+            TinyImageMessage = await message.channel.send(message.content, embed = TinyEmbed)
             await TinyImageMessage.add_reaction('❌')
+
+            OrigEmbed.description = f'[돌아가기]({TinyImageMessage.jump_url})'
+            await OriginalImageMessage.edit(embed = OrigEmbed)
             await message.delete()
 
     @commands.Cog.listener('on_reaction_add')
