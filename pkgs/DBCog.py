@@ -1,4 +1,4 @@
-import os, pickle
+import discord, os, pickle, re
 from discord.ext import commands
 
 class DBCog(commands.Cog):
@@ -24,7 +24,34 @@ class DBCog(commands.Cog):
         print(f'{self.CogName}.db saved!')
 
     def mention2member(self, mention, guild):
-        member_id = mention[2:-1]
-        if member_id[0] == '!': member_id = member_id[1:]
-        member_id = int(member_id)
+        member_id = int(re.sub("[^0-9]", "", mention))
         return guild.get_member(member_id)
+
+    def mention2role(self, mention, guild):
+        role_id = int(re.sub("[^0-9]", "", mention))
+        return guild.get_role(role_id)
+    
+    async def waitforModMessage(self, channel):
+        def checker(message):
+            return message.author.id == self.app.owner_id and message.channel == channel
+        return await self.app.wait_for('message', check = checker)
+
+    async def waitforModReaction(self, message, emojis):
+        for emoji in emojis:
+            await message.add_reaction(emoji)
+        def checker(reaction, user):
+            return reaction.message == message and reaction.emoji in emojis and user.id == self.app.owner_id
+        reaction, _ = await self.app.wait_for('reaction_add', check = checker)
+        return emojis.index(reaction.emoji)
+
+    async def MessageFromLink(self, link):
+        guild_id = int(link.split('/')[-3])
+        channel_id = int(link.split('/')[-2])
+        message_id = int(link.split('/')[-1])
+        guild = self.app.get_guild(guild_id)
+        channel = guild.get_channel(channel_id)
+        return await channel.fetch_message(message_id)
+
+    def GetDisplayName(self, member):
+        if member.nick: return member.nick
+        return member.name
