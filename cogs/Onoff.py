@@ -12,7 +12,7 @@ class Core(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        await self.app.change_presence(activity = discord.Game('Botory 2.2.0 by Undec'))
+        await self.app.change_presence(activity = discord.Game('Botory 2.2.1 by Undec'))
         GlobalDB['IgnoreChannels'] = []
         guild = self.app.get_guild(GlobalDB['StoryGuildID'])
         self.MemberRole = discord.utils.get(guild.roles, name = '멤버')
