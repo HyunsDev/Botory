@@ -1,12 +1,13 @@
 import discord
 from discord.ext import commands
-from pkgs.DBCog import DBCog
 from pkgs.GlobalDB import GlobalDB
+from pkgs.DBCog import DBCog
 from functools import wraps
 
 def SkipCheck(func):
     @wraps(func)
     async def wrapper(self, message):
+        if message.guild.id != GlobalDB['StoryGuildID']: return
         if message.author.bot or message.author.guild_permissions.administrator: return
         if message.channel.id in GlobalDB['IgnoreChannels']: return
         return await func(self, message)
@@ -26,6 +27,7 @@ class Core(DBCog):
     @commands.command(name = 'setlimit')
     @commands.has_guild_permissions(administrator = True)
     async def SetLimit(self, ctx, arg):
+        if ctx.guild.id != GlobalDB['StoryGuildID']: return
         await ctx.message.delete()
         if arg[-1] == 'l':
             self.DB['MaxLines'] = int(arg[:-1])
@@ -39,6 +41,7 @@ class Core(DBCog):
     @commands.command(name = 'reporthere')
     @commands.has_guild_permissions(administrator = True)
     async def SetChannels(self, ctx):
+        if ctx.guild.id != GlobalDB['StoryGuildID']: return
         await ctx.message.delete()
         self.DB['ReportChannel'] = ctx.channel.id
 
@@ -89,6 +92,7 @@ class Core(DBCog):
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
+        if message.guild.id != GlobalDB['StoryGuildID']: return
         if user.bot or user.guild_permissions.administrator: return
         if reaction.message.channel.id in GlobalDB['IgnoreChannels']: return
         if '🖕' in str(reaction.emoji):

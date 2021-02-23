@@ -17,6 +17,7 @@ class Core(DBCog):
     @commands.group(name = 'image')
     @commands.has_guild_permissions(administrator = True)
     async def ImageGroup(self, ctx):
+        if ctx.guild.id != GlobalDB['StoryGuildID']: return
         await ctx.message.delete()
         if ctx.invoked_subcommand == None:
             await ctx.channel.send('Automatic reactor.\nSubcommands : here, ignore')
@@ -35,6 +36,7 @@ class Core(DBCog):
 
     @commands.Cog.listener('on_message')
     async def CompImage(self, message):
+        if message.guild.id != GlobalDB['StoryGuildID']: return
         if message.author.bot or message.author.guild_permissions.administrator: return
         if message.channel.id in GlobalDB['IgnoreChannels']: return
         if message.channel.id in self.DB['IgnoreChannels']: return
@@ -58,6 +60,7 @@ class Core(DBCog):
 
     @commands.Cog.listener('on_reaction_add')
     async def DelImage(self, reaction, user):
+        if reaction.message.guild.id != GlobalDB['StoryGuildID']: return
         if reaction.emoji != '❌': return
         if str(user.id) != reaction.message.embeds[0].url.split('/')[-1]: return
         jump_url = reaction.message.embeds[0].description.split('(')[1].split(')')[0]
