@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from pkgs.DBCog import DBCog
+from pkgs.GlobalDB import GlobalDB
 from pkgs.Scheduler import *
 
 class Core(DBCog):
@@ -14,6 +15,7 @@ class Core(DBCog):
     @commands.group(name = 'reactor')
     @commands.has_guild_permissions(administrator = True)
     async def ReactorGroup(self, ctx):
+        if ctx.guild.id != GlobalDB['StoryGuildID']: return
         await ctx.message.delete()
         if ctx.invoked_subcommand == None:
             await ctx.channel.send('Automatic reactor.\n'
@@ -52,6 +54,7 @@ class Core(DBCog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        if message.guild.id != GlobalDB['StoryGuildID']: return
         if message.author.id in self.DB:
             expiration = self.DB[message.author.id]['expire_at']
             if expiration:

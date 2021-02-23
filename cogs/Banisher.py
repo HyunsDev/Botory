@@ -1,5 +1,6 @@
 import discord, asyncio
 from discord.ext import commands
+from pkgs.GlobalDB import GlobalDB
 from pkgs.DBCog import DBCog
 from pkgs.Scheduler import *
 
@@ -14,23 +15,24 @@ class Core(DBCog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.guild = self.app.guilds[0]
+        StoryGuild = self.app.get_guild(GlobalDB['StoryGuildID'])
         whoid_list = []
         for whoid in self.DB:
             if self.DB[whoid]['expire_at']: whoid_list.append(whoid)
         whoid_list.sort(key = lambda whoid: self.DB[whoid]['expire_at'].value)
         for whoid in whoid_list:
-            who = self.guild.get_member(whoid)
+            who = StoryGuild.get_member(whoid)
             if self.DB[who.id]['expire_at'].is_done():
                 await self._forgive(None, who)
                 continue
             time_left = self.DB[who.id]['expire_at'].time_left()
             await asyncio.sleep(time_left.to_secs())
-            await self._forgive(self.guild.get_channel(self.DB[who.id]['channel']), who)
+            await self._forgive(StoryGuild.get_channel(self.DB[who.id]['channel']), who)
 
     @commands.command(name = 'banish')
     @commands.has_guild_permissions(administrator = True)
     async def Banish(self, ctx, who):
+        if ctx.guild.id != GlobalDB['StoryGuildID']: return
         await ctx.message.delete()
         who = self.mention2member(who, ctx.guild)
         if await self._banish(ctx, who) != 'skip':
@@ -40,6 +42,7 @@ class Core(DBCog):
     @commands.command(name = 'tempbanish')
     @commands.has_guild_permissions(administrator = True)
     async def TempBanish(self, ctx, who, duration):
+        if ctx.guild.id != GlobalDB['StoryGuildID']: return
         await ctx.message.delete()
         who = self.mention2member(who, ctx.guild)
         if await self._banish(ctx, who) != 'skip':
@@ -52,6 +55,7 @@ class Core(DBCog):
     @commands.command(name = 'forgive')
     @commands.has_guild_permissions(administrator = True)
     async def Forgive(self, ctx, who):
+        if ctx.guild.id != GlobalDB['StoryGuildID']: return
         await ctx.message.delete()
         who = self.mention2member(who, ctx.guild)
         await self._forgive(ctx.channel, who)
@@ -77,10 +81,11 @@ class Core(DBCog):
             embed = discord.Embed(title = '', description = f'<@{who.id}> 님은 유배중이 아닙니다.')
             await channel.send(embed = embed)
         else:
+            StoryGuild = self.app.get_guild(GlobalDB['StoryGuildID'])
             nick = self.DB[who.id]['nick']
             roles = []
             for role_id in self.DB[who.id]['roles']:
-                role = self.guild.get_role(role_id)
+                role = StoryGuild.get_role(role_id)
                 roles.append(role)
             del self.DB[who.id]
             await who.edit(nick = nick)

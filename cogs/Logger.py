@@ -17,6 +17,7 @@ class Core(DBCog):
     @commands.group(name = 'logger')
     @commands.has_guild_permissions(administrator = True)
     async def LoggerGroup(self, ctx):
+        if ctx.guild.id != GlobalDB['StoryGuildID']: return
         await ctx.message.delete()
         if ctx.invoked_subcommand == None:
             await ctx.channel.send('Logger system.\n'
@@ -31,6 +32,7 @@ class Core(DBCog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        if message.guild.id != GlobalDB['StoryGuildID']: return
         if message.author.bot: return
         if message.channel.id in GlobalDB['IgnoreChannels']: return
         if len(message.attachments) and self.DB['Attachments']:
@@ -48,6 +50,7 @@ class Core(DBCog):
 
     @commands.Cog.listener()
     async def on_reaction_remove(self, reaction, user):
+        if reaction.message.guild.id != GlobalDB['StoryGuildID']: return
         if user.bot: return
         if reaction.message.channel.id in GlobalDB['IgnoreChannels']: return
         if self.DB['Reaction']:

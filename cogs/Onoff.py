@@ -3,12 +3,12 @@ from pkgs.DBCog import DBCog
 from pkgs.GlobalDB import GlobalDB
 from discord.ext import commands
 
-class Core(commands.Cog):
+class Core(DBCog):
     def __init__(self, app):
-        self.app = app
-        self.app.add_cog(self)
+        self.CogName = 'OnOff'
+        DBCog.__init__(self, app)
 
-    def saveDB(self): pass
+    def initDB(self): self.DB = dict()
 
     @commands.Cog.listener()
     async def on_ready(self):

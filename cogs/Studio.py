@@ -52,8 +52,10 @@ class Core(DBCog):
             isUser = False
             async for guild in self.app.fetch_guilds(limit = None):
                 if guild == Studio: continue
-                if await guild.fetch_member(member.id):
+                try:
+                    await guild.fetch_member(member.id)
                     isUser = True
                     break
+                except: continue
             if isUser: await member.add_roles(UserRole)
             else: await member.remove_roles(UserRole)
