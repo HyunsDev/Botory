@@ -39,7 +39,7 @@ class Core(DBCog):
 
     @commands.command(name = 'watchhere')
     @commands.has_guild_permissions(administrator = True)
-    async def SetIgnore(self, ctx):
+    async def DelIgnore(self, ctx):
         await ctx.message.delete()
         GlobalDB['IgnoreChannels'].remove(ctx.channel.id)
 
