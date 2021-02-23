@@ -92,7 +92,7 @@ class Core(DBCog):
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
-        if message.guild.id != GlobalDB['StoryGuildID']: return
+        if reaction.message.guild.id != GlobalDB['StoryGuildID']: return
         if user.bot or user.guild_permissions.administrator: return
         if reaction.message.channel.id in GlobalDB['IgnoreChannels']: return
         if '🖕' in str(reaction.emoji):

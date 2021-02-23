@@ -16,7 +16,7 @@ def loadDB():
 def initDB():
     global GlobalDB
     GlobalDB['StoryGuildID'] = 775210688183664640
-    GlobalDB['IgnoreChannels'] = []
+    GlobalDB['IgnoreChannels'] = set()
 
 def saveDB():
     global GlobalDB
