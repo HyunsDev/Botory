@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from pkgs.DBCog import DBCog
-from cogs.GlobalDB import getGlobalDB
+from pkgs.GlobalDB import GlobalDB
 from datetime import datetime, timezone, timedelta
 
 class Core(DBCog):
@@ -32,7 +32,7 @@ class Core(DBCog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot: return
-        if message.channel.id in getGlobalDB('IgnoreChannels'): return
+        if message.channel.id in GlobalDB['IgnoreChannels']: return
         if len(message.attachments) and self.DB['Attachments']:
             files = [await attachment.to_file(spoiler = attachment.is_spoiler(), use_cached = True) for attachment in message.attachments]
             LogChannel = message.guild.get_channel(self.DB['Attachments'])
@@ -49,7 +49,7 @@ class Core(DBCog):
     @commands.Cog.listener()
     async def on_reaction_remove(self, reaction, user):
         if user.bot: return
-        if reaction.message.channel.id in getGlobalDB('IgnoreChannels'): return
+        if reaction.message.channel.id in GlobalDB['IgnoreChannels']: return
         if self.DB['Reaction']:
             embed = discord.Embed(title = '',
                     description = f'Reaction deleted from [a message]({reaction.message.jump_url}) in <#{reaction.message.channel.id}>',

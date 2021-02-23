@@ -2,8 +2,7 @@ import discord, uuid, os
 from PIL import Image
 from discord.ext import commands
 from pkgs.DBCog import DBCog
-from cogs.GlobalDB import getGlobalDB
-from datetime import datetime, timezone, timedelta
+from pkgs.GlobalDB import GlobalDB
 
 class Core(DBCog):
     def __init__(self, app):
@@ -37,7 +36,7 @@ class Core(DBCog):
     @commands.Cog.listener('on_message')
     async def CompImage(self, message):
         if message.author.bot or message.author.guild_permissions.administrator: return
-        if message.channel.id in getGlobalDB('IgnoreChannels'): return
+        if message.channel.id in GlobalDB['IgnoreChannels']: return
         if message.channel.id in self.DB['IgnoreChannels']: return
         if len(message.attachments) > 0 and self.DB['ImageChannel']:
             ImageChannel = message.guild.get_channel(self.DB['ImageChannel'])

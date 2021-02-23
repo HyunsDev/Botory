@@ -1,13 +1,16 @@
 import discord, sys, os, pickle
 from discord.ext import commands
+from pkgs import GlobalDB
 import cogs
 
-app = commands.Bot(command_prefix = '&', intents = discord.Intents.all())
+app = commands.Bot(command_prefix = '&', intents = discord.Intents.all(), help_command = None)
 
 def main():
+    GlobalDB.loadDB()
     cogs = InitCogs()
     app.run(GetToken())
     for cog in cogs: cog.saveDB()
+    GlobalDB.saveDB()
 
 def InitCogs():
     res = []
