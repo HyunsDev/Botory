@@ -1,5 +1,6 @@
 import discord, asyncio
 from discord.ext import commands
+from pkgs.GlobalDB import GlobalDB
 from pkgs.DBCog import DBCog
 
 class Core(DBCog):
@@ -19,6 +20,7 @@ class Core(DBCog):
     @commands.group(name = 'status')
     @commands.has_guild_permissions(administrator = True)
     async def StatusGroup(self, ctx):
+        if ctx.guild.id != GlobalDB['StoryGuildID']: return
         await ctx.message.delete()
         if ctx.invoked_subcommand == None:
             await ctx.channel.send('Status Manager\nSubcommands : setup')
@@ -32,7 +34,7 @@ class Core(DBCog):
         await self.RunStatusViewer()
 
     async def RunStatusViewer(self):
-        guild = self.app.guilds[0]
+        guild = self.app.get_guild(GlobalDB['StoryGuildID'])
         MemberRole = discord.utils.get(guild.roles, name = '멤버')
         AllCountChannel = guild.get_channel(self.DB['AllCount'])
         MemberCountChannel = guild.get_channel(self.DB['MemberCount'])
