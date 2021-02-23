@@ -1,14 +1,14 @@
 import discord
 from discord.ext import commands
 from pkgs.DBCog import DBCog
-from cogs.GlobalDB import getGlobalDB
+from pkgs.GlobalDB import GlobalDB
 from functools import wraps
 
 def SkipCheck(func):
     @wraps(func)
     async def wrapper(self, message):
         if message.author.bot or message.author.guild_permissions.administrator: return
-        if message.channel.id in getGlobalDB('IgnoreChannels'): return
+        if message.channel.id in GlobalDB['IgnoreChannels']: return
         return await func(self, message)
     return wrapper
 
@@ -90,7 +90,7 @@ class Core(DBCog):
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
         if user.bot or user.guild_permissions.administrator: return
-        if reaction.message.channel.id in getGlobalDB('IgnoreChannels'): return
+        if reaction.message.channel.id in GlobalDB['IgnoreChannels']: return
         if '🖕' in str(reaction.emoji):
             await reaction.clear()
             await self.MiddleFingerReport(user.id, reaction.message.channel)

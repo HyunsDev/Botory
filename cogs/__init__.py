@@ -1,1 +1,1 @@
-__all__ = sorted(['Reactor', 'Banisher', 'Logger', 'Filter', 'Status', 'Onoff', 'GlobalDB', 'ImageCompressor'])
+__all__ = ['Reactor', 'Banisher', 'Logger', 'Filter', 'Status', 'Onoff', 'ImageCompressor', 'Studio']

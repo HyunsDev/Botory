@@ -1,4 +1,6 @@
 import discord, asyncio
+from pkgs.DBCog import DBCog
+from pkgs.GlobalDB import GlobalDB
 from discord.ext import commands
 
 class Core(commands.Cog):
@@ -10,9 +12,10 @@ class Core(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        await self.app.change_presence(activity = discord.Game('Botory 2.1.3 by Undec'))
-        self.guild = self.app.guilds[0]
-        self.MemberRole = discord.utils.get(self.guild.roles, name = '멤버')
+        await self.app.change_presence(activity = discord.Game('Botory 2.2.0 by Undec'))
+        GlobalDB['IgnoreChannels'] = []
+        guild = self.app.get_guild(GlobalDB['StoryGuildID'])
+        self.MemberRole = discord.utils.get(guild.roles, name = '멤버')
         perms = self.MemberRole.permissions
         perms.update(add_reactions = True, attach_files = True)
         await self.MemberRole.edit(permissions = perms)
