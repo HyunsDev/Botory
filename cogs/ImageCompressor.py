@@ -51,7 +51,7 @@ class Core(DBCog):
 
             TinyEmbed = await self.GenAuthorEmbed(message.author, f'[원본보기]({OriginalImageMessage.jump_url})')
             TinyEmbed.set_thumbnail(url = OriginalImageMessage.attachments[0].url)
-            TinyImageMessage = await message.channel.send(message.content, embed = TinyEmbed)
+            TinyImageMessage = await message.channel.send(message.content, embed = TinyEmbed, reference = message.reference)
             await TinyImageMessage.add_reaction('❌')
 
             OrigEmbed.description = f'[돌아가기]({TinyImageMessage.jump_url})'
