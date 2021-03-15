@@ -71,17 +71,6 @@ class Core(DBCog):
     @commands.Cog.listener('on_message')
     @SkipCheck
     async def LengthLimiter(self, message):
-
-        # # 글자 수 제한
-        # if len(message.content) > self.DB['MaxLength']:
-        #     await message.channel.send(f'<@{message.author.id}> {self.DB["MaxLength"]}자 초과로 삭제되었습니다.', delete_after = 1.0)
-        #     await message.delete()
-
-        # # 줄 제한
-        # if message.content.count('\n') >= self.DB['MaxLines']:
-        #     await message.channel.send(f'<@{message.author.id}> {self.DB["MaxLines"] + 1}줄 이상은 받지 않습니다.', delete_after = 1.0)
-        #     await message.delete()
-
         if len(message.content) <= self.DB['MaxLength'] and message.content.count('\n') < self.DB['MaxLines']:
             return None
 
@@ -110,7 +99,6 @@ class Core(DBCog):
 
         # 원본 삭제
         await message.delete()
-
 
     @commands.Cog.listener('on_message')
     @SkipCheck
@@ -142,7 +130,6 @@ class Core(DBCog):
         embed = discord.Embed(url = f'http://www.{uuid.uuid4().hex}.com/{author.id}', description = description)
         embed.set_author(name = DisplayName, icon_url = str(author.avatar_url))
         return embed
-
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
