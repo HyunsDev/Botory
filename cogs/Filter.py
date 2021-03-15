@@ -90,7 +90,7 @@ class Core(DBCog):
 
         # 단축된 메세지
         LongMsgTinyEmbed = await self.GenAuthorEmbed(message.author, f'긴 메세지\n[내용보기]({LongMsgOrigInfoMessage.jump_url})')
-        LongMsgTinyMessage = await message.channel.send(message.content, embed = LongMsgTinyEmbed, reference = message.reference)
+        LongMsgTinyMessage = await message.channel.send(embed = LongMsgTinyEmbed, reference = message.reference)
         await LongMsgTinyMessage.add_reaction('❌')
 
         # 사본 긴 메세지 [돌아가기]
