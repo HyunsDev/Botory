@@ -1,4 +1,4 @@
-import discord
+import discord, uuid
 from discord.ext import commands
 from pkgs.GlobalDB import GlobalDB
 from pkgs.DBCog import DBCog
@@ -72,15 +72,45 @@ class Core(DBCog):
     @SkipCheck
     async def LengthLimiter(self, message):
 
-        # 글자 수 제한
-        if len(message.content) > self.DB['MaxLength']:
-            await message.channel.send(f'<@{message.author.id}> {self.DB["MaxLength"]}자 초과로 삭제되었습니다.', delete_after = 1.0)
-            await message.delete()
+        # # 글자 수 제한
+        # if len(message.content) > self.DB['MaxLength']:
+        #     await message.channel.send(f'<@{message.author.id}> {self.DB["MaxLength"]}자 초과로 삭제되었습니다.', delete_after = 1.0)
+        #     await message.delete()
 
-        # 줄 제한
-        if message.content.count('\n') >= self.DB['MaxLines']:
-            await message.channel.send(f'<@{message.author.id}> {self.DB["MaxLines"] + 1}줄 이상은 받지 않습니다.', delete_after = 1.0)
-            await message.delete()
+        # # 줄 제한
+        # if message.content.count('\n') >= self.DB['MaxLines']:
+        #     await message.channel.send(f'<@{message.author.id}> {self.DB["MaxLines"] + 1}줄 이상은 받지 않습니다.', delete_after = 1.0)
+        #     await message.delete()
+
+        if len(message.content) <= self.DB['MaxLength'] and message.content.count('\n') < self.DB['MaxLines']:
+            return None
+
+        LongTextChannel = message.guild.get_channel(self.DB['LongTextChannel'])
+
+        # 사본 긴 메세지 정보
+        LongMsgOrigInfoEmbed = await self.GenAuthorEmbed(message.author, '[Button Loading]')
+        LongMsgOrigInfoMessage = await LongTextChannel.send(embed=LongMsgOrigInfoEmbed)
+        await LongMsgOrigInfoMessage.add_reaction('❌')
+
+        # 사본 긴 메세지
+        LongMsgOrigContent = message.content
+        MsgFilter = ['@'] # 맨션 테러를 막기 위해 인라인 맨션 필터링
+        for i in MsgFilter:
+            LongMsgOrigContent = LongMsgOrigContent.replace(i, '\\'+i)
+        await LongTextChannel.send(LongMsgOrigContent)
+
+        # 단축된 메세지
+        LongMsgTinyEmbed = await self.GenAuthorEmbed(message.author, f'긴 메세지\n[내용보기]({LongMsgOrigInfoMessage.jump_url})')
+        LongMsgTinyMessage = await message.channel.send(message.content, embed = LongMsgTinyEmbed, reference = message.reference)
+        await LongMsgTinyMessage.add_reaction('❌')
+
+        # 사본 긴 메세지 [돌아가기]
+        LongMsgOrigInfoMessage.description = f'[돌아가기]({LongMsgTinyMessage.jump_url})'
+        await LongMsgOrigInfoMessage.edit(embed = LongMsgOrigInfoEmbed)
+
+        # 원본 삭제
+        await message.delete()
+
 
     @commands.Cog.listener('on_message')
     @SkipCheck
@@ -94,6 +124,25 @@ class Core(DBCog):
     async def DontSendMultipleFiles(self, message):
         if len(message.attachments) > 1:
             await message.channel.send('파일은 한번에 하나씩만 보내 주세요!', delete_after = 2.0)
+
+   
+    @commands.Cog.listener('on_reaction_add')
+    async def DelLongMsg(self, reaction, user):
+        jump_url = reaction.message.embeds[0].description.split('(')[1].split(')')[0]
+        channel_id = int(jump_url.split('/')[-2])
+        message_id = int(jump_url.split('/')[-1])
+        guild = self.app.guilds[0]
+        channel = guild.get_channel(channel_id)
+        message = await channel.fetch_message(message_id)
+        await reaction.message.delete()
+        await message.delete()
+
+    async def GenAuthorEmbed(self, author, description):
+        DisplayName = author.nick if author.nick else author.name
+        embed = discord.Embed(url = f'http://www.{uuid.uuid4().hex}.com/{author.id}', description = description)
+        embed.set_author(name = DisplayName, icon_url = str(author.avatar_url))
+        return embed
+
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
