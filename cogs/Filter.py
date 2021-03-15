@@ -67,14 +67,19 @@ class Core(DBCog):
                 ReportChannel = message.guild.get_channel(self.DB['ReportChannel'])
                 await ReportChannel.send("<@%d> 이 사용자 서버장 직접멘션으로 경고바랍니다."%message.author.id, allowed_mentions = discord.AllowedMentions.none())
 
+    # 글자 수 제한 초과, 줄 제한 초과
     @commands.Cog.listener('on_message')
     @SkipCheck
     async def LengthLimiter(self, message):
+
+        # 글자 수 제한
         if len(message.content) > self.DB['MaxLength']:
             await message.channel.send(f'<@{message.author.id}> {self.DB["MaxLength"]}자 초과로 삭제되었습니다.', delete_after = 1.0)
             await message.delete()
+
+        # 줄 제한
         if message.content.count('\n') >= self.DB['MaxLines']:
-            await message.channel.send(f'<@{message.author.id}> {self.DB["MaxLines"] + 1}줄 이상은 안받아요.', delete_after = 1.0)
+            await message.channel.send(f'<@{message.author.id}> {self.DB["MaxLines"] + 1}줄 이상은 받지 않습니다.', delete_after = 1.0)
             await message.delete()
 
     @commands.Cog.listener('on_message')
